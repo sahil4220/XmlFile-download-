@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XMLFILE</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <style>
+        .selected {
+            height: 36px;
+            width: 86px;
+        }
+.recom-field{
+    display:none;
+}
+.cat-field{
+    display:none;
+}
+       
+    </style>
+
+</head>
+
+<body>
+
+    <select class="selected">
+        <option class="nav" value="k11-navigation">kimbal</option>
+        <option class="hos" value="k11-hospitality">hospitality</option>
+    </select>
+
+    <div class="btn-div">
+        <button class="recom-btn">Recommendation</button>
+        <button class="cat-btn">category</button>
+
+    </div>
+<div>
+    <div class="recom-field">
+        <label>Souce Id</label>
+        <textarea class="recom-text"> </textarea><br>
+        <label>Target Id</label>
+        <textarea class="recom-text" ></textarea>
+    </div>
+
+    <div class="cat-field">
+        <label>Category Id</label>
+        <textarea class="cat-text"> </textarea><br>
+        <label>Product Id</label>
+        <textarea class="cat-text" ></textarea>
+    </div>
+
+    </div>
+    <textarea class="download-file"></textarea>
+    <button class="down-btn">download</button>
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            $(".cat-btn").on("click", function () { 
+                $(".cat-field").show()
+                $(".recom-field").hide()
+            })
+
+
+            $(".recom-btn").on("click", function () {  
+                $(".recom-field").show()
+                $(".cat-field").hide()
+                
+            })
+            
+            $(".down-btn").on("click", function () {
+        
+        var sourceId = $(".recom-text").eq(0).val().split(","); 
+        var targetId = $(".recom-text").eq(1).val().split(","); 
+        var categoryId = $(".cat-text").eq(0).val().split(","); 
+        var productId = $(".cat-text").eq(1).val().split(","); 
+
+        var navname=$(".selected").val();
+
+        let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+            xmlContent += `<catalog xmlns="http://www.demandware.com/xml/impex/catalog/2006-10-31" catalog-id=${navname}>\n`;
+
+                if(categoryId && productId){
+                    categoryId.forEach((category) => {
+                    productId.forEach((product) => {
+                    xmlContent += `<category-assignment category-id="${category.trim()}" product-id="${product.trim()}"/>\n`;
+                 });
+               });
+            }
+            
+                
+
+                if(sourceId && targetId){
+                    sourceId.forEach((source) => {
+                        targetId.forEach((target)=>{
+                            xmlContent += `<recommendation source-id="${source.trim()}" source-type="product" target-id="${target.trim()}" type="1"/>\n`
+                        })
+
+                        
+                    })    
+                }
+                xmlContent+=`</catalog>`;
+                $(".download-file").html(xmlContent)
+
+                const link = document.createElement("a");
+          $("body").append(link);
+          const file = new Blob([xmlContent], { type: 'text/plain' });
+          link.href = URL.createObjectURL(file);
+          link.download = "sample.xml";
+          link.click();
+          URL.revokeObjectURL(link.href);
+
+
+    });
+
+        })
+
+
+    
+    </script>
+
+
+</body>
+
+</html>
